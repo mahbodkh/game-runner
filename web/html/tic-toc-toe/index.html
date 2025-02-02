@@ -3,40 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tic-Toc-Toe</title>
+    <title>Tic-Tac-Toe</title>
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; connect-src 'self' ws://localhost:3000/ws; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+      content="default-src 'self'; connect-src 'self' ws://localhost:3000/ws; script-src 'self'; style-src 'self';"
     />
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body style="background-color: darkslategrey">
-    <h1>Tic-Toc-Toe</h1>
+  <body>
+    <h1>Tic-Tac-Toe</h1>
+    <div id="game-board">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
+    </div>
     <div id="messages"></div>
+    <div id="players"></div>
+    <div id="session-list"></div>
 
-    <script>
-      // const ws = new WebSocket('ws://' + window.location.host + '/ws');
-      const ws = new WebSocket('ws://localhost:3000/ws');
-
-      ws.onopen = () => {
-        console.log('WebSocket connection established');
-        ws.send('Hello Server!');
-      };
-
-      ws.onmessage = (event) => {
-        console.log('Received:', event.data);
-        const messagesDiv = document.getElementById('messages');
-        const messageElem = document.createElement('p');
-        messageElem.textContent = event.data;
-        messagesDiv.appendChild(messageElem);
-      };
-
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-
-      ws.onclose = () => {
-        console.log('WebSocket connection closed');
-      };
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
