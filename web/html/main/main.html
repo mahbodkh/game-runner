@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Game Runner - Choose a Game</title>
+  </head>
+  <body>
+    <h1>Welcome to Game Runner</h1>
+    <p>Select a game from the list below:</p>
+    <ul id="gameList"></ul>
+
+    <script>
+      fetch('/api/games')
+        .then((response) => response.json())
+        .then((data) => {
+          const list = document.getElementById('gameList');
+          data.forEach((game) => {
+            const li = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = `/games/${game.path}/lobby.html`;
+            link.textContent = game.name;
+            li.appendChild(link);
+            list.appendChild(li);
+          });
+        })
+        .catch((err) => console.error('Error fetching games:', err));
+    </script>
+  </body>
+</html>

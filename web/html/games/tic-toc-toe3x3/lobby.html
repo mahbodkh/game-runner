@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tic-Tac-Toe 3x3 Lobby</title>
+  </head>
+  <body>
+    <h1>Tic-Tac-Toe 3x3 Lobby</h1>
+    <p id="status">Loading available players for this game...</p>
+    <ul id="playerList"></ul>
+
+    <script>
+      // Example: fetch players who are available for "3x3"
+      fetch('/api/players?game=3x3')
+        .then((response) => response.json())
+        .then((data) => {
+          const list = document.getElementById('playerList');
+          document.getElementById('status').textContent =
+            'Select a player to challenge or wait for them...';
+          data.forEach((player) => {
+            const li = document.createElement('li');
+            li.textContent = player.name;
+            li.onclick = () => joinPlayer(player.id);
+            list.appendChild(li);
+          });
+        })
+        .catch((err) => console.error('Error fetching players:', err));
+
+      function joinPlayer(playerId) {
+        // POST to create or join a session with that player for "3x3"
+        fetch('/api/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ game: '3x3', opponentId: playerId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Suppose 'data.sessionId' is returned
+            window.location.href = `/games/tic-toc-toe3x3/index.html?sessionId=${data.sessionId}`;
+          })
+          .catch((err) => console.error('Error joining player:', err));
+      }
+    </script>
+  </body>
+</html>

@@ -173,14 +173,8 @@ func contains(slice []int32, item int32) bool {
 func InitWebsocketService() {
 	http.HandleFunc("/ws", handleWS)
 
-	fs := http.FileServer(http.Dir("./web/html/tic-toc-toe"))
+	fs := http.FileServer(http.Dir("./web/html/"))
 	http.Handle("/", fs)
 
 	logrus.Info("WebSocket service started on ws://localhost:3000/ws")
-	logrus.Info("Game started on http://localhost:3000/")
-
-	err := http.ListenAndServe(":3000", nil)
-	if err != nil {
-		logrus.Fatalf("ListenAndServe failed: %v", err)
-	}
 }
