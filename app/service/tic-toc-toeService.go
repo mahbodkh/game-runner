@@ -131,12 +131,8 @@ func handleMakeMove(conn *websocket.Conn, player model.Player, gameState *model.
 		}
 
 		if checkWin(session.Board, player.Mark) {
-			session.Status = model.StatusCompleted
-			model.UpdateSession(session)
 			broadcastGameResult(gameState.SessionID, player.ID, "win")
 		} else if checkDraw(session.Board) {
-			session.Status = model.StatusCompleted
-			model.UpdateSession(session)
 			broadcastGameResult(gameState.SessionID, 0, "draw")
 		}
 
@@ -188,6 +184,15 @@ func checkDraw(board [9]string) bool {
 }
 
 func broadcastGameResult(sessionID int32, winnerID int32, result string) {
+	session := sessions[sessionID]
+
+	session.Status = model.StatusCompleted
+	_, err := model.UpdateSession(session)
+	if err != nil {
+		logrus.Error("Error updating session:", err)
+		return
+	}
+
 	for conn, player := range players {
 		if contains(sessions[sessionID].Players, player.ID) {
 			gameResult := map[string]interface{}{
@@ -197,6 +202,13 @@ func broadcastGameResult(sessionID int32, winnerID int32, result string) {
 				"session": sessionID,
 			}
 			conn.WriteJSON(gameResult)
+
+			if player.ID == winnerID {
+				conn.WriteJSON(map[string]interface{}{
+					"status":  model.StatusCompleted,
+					"message": "Congratulations! You have won the game.",
+				})
+			}
 		}
 	}
 }

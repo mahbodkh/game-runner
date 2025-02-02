@@ -9,6 +9,7 @@ type Action string
 type GameState struct {
 	Board        [9]string     `json:"board"`
 	Player       int32         `json:"player"`
+	Players      []Player      `json:"players"`
 	Action       Action        `json:"action"`
 	SessionID    int32         `json:"sessionId,omitempty"`
 	Index        string        `json:"index,omitempty"`
