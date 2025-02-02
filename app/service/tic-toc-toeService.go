@@ -122,28 +122,26 @@ func handleMakeMove(conn *websocket.Conn, player model.Player, gameState *model.
 		return
 	}
 
-	if gameState.Board[index] == "" {
-		gameState.Board[index] = player.Mark
-		if len(session.Players) == 2 {
-			if player.Mark == X {
-				// index out of range [1] with length 1
-				// something is wrong here with the logic because it's always X and client doesn't know!
-				session.CurrentPlayer = session.Players[1]
-			} else {
-				session.CurrentPlayer = session.Players[0]
-			}
+	if session.Board[index] == "" {
+		session.Board[index] = player.Mark
+		if player.Mark == X {
+			session.CurrentPlayer = session.Players[1]
+		} else {
+			session.CurrentPlayer = session.Players[0]
 		}
 
-		if checkWin(gameState.Board, player.Mark) {
+		if checkWin(session.Board, player.Mark) {
 			session.Status = model.StatusCompleted
+			model.UpdateSession(session)
 			broadcastGameResult(gameState.SessionID, player.ID, "win")
-		} else if checkDraw(gameState.Board) {
+		} else if checkDraw(session.Board) {
 			session.Status = model.StatusCompleted
+			model.UpdateSession(session)
 			broadcastGameResult(gameState.SessionID, 0, "draw")
 		}
 
 		sessions[gameState.SessionID] = session
-		broadcastBoardUpdate(gameState.SessionID, gameState.Board)
+		broadcastBoardUpdate(gameState.SessionID, session.Board)
 	}
 }
 
@@ -160,21 +158,6 @@ func getSessionFromCacheOrDbByUserId(sessionId int32, playerId int32) model.Sess
 			logrus.Error("Error getting session:", err)
 			return model.Session{}
 		}
-		sessions[session.ID] = session
-	}
-	return session
-}
-
-func getSessionFromCacheOrDbById(sessionId int32) model.Session {
-	session, ok := sessions[sessionId]
-	if !ok {
-		var err error
-		sessionDb, err := model.GetSessionById(sessionId)
-		if err != nil {
-			logrus.Error("Error getting session:", err)
-			return model.Session{}
-		}
-		session = sessionDb
 		sessions[session.ID] = session
 	}
 	return session
@@ -217,7 +200,6 @@ func broadcastGameResult(sessionID int32, winnerID int32, result string) {
 		}
 	}
 }
-
 func broadcastBoardUpdate(sessionID int32, board [9]string) {
 	for conn, player := range players {
 		if contains(sessions[sessionID].Players, player.ID) {

@@ -37,7 +37,8 @@ type Session struct {
 	UniqueId      int32
 	CurrentPlayer int32
 	Status        SessionStatus
-	Players       []int32 // not sure!! probably should be a list of players by ID and eventually remove the UserIdFrom and UserIdTo
+	Players       []int32
+	Board         [9]string
 	Created       time.Time
 	Updated       time.Time
 }
