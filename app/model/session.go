@@ -4,7 +4,6 @@ package model
 CREATE TABLE sessions (
     id SERIAL PRIMARY KEY,
     status VARCHAR(50),
-    current_player INT,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -45,8 +44,8 @@ type Session struct {
 
 func GetSessionById(id int32) (Session, error) {
 	var session Session
-	err := db.Conn.QueryRow(context.Background(), "SELECT id, current_player, status, created, updated FROM sessions WHERE id = $1", id).Scan(
-		&session.ID, &session.CurrentPlayer, &session.Status, &session.Created, &session.Updated)
+	err := db.Conn.QueryRow(context.Background(), "SELECT id, status, created, updated FROM sessions WHERE id = $1", id).Scan(
+		&session.ID, &session.Status, &session.Created, &session.Updated)
 	if err != nil {
 		return Session{}, err
 	}
@@ -72,8 +71,8 @@ func GetSessionById(id int32) (Session, error) {
 func SaveSession(session Session) (int32, error) {
 	var id int32
 	err := db.Conn.QueryRow(context.Background(),
-		"INSERT INTO sessions (current_player, status, created, updated) VALUES ($1, $2, $3, $4) RETURNING id",
-		session.CurrentPlayer, session.Status, session.Created, session.Updated).Scan(&id)
+		"INSERT INTO sessions (status, created, updated) VALUES ($1, $2, $3) RETURNING id",
+		session.Status, session.Created, session.Updated).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -90,8 +89,8 @@ func SaveSession(session Session) (int32, error) {
 }
 
 func UpdateSession(session Session) (Session, error) {
-	_, err := db.Conn.Exec(context.Background(), "UPDATE sessions SET current_player=$1, status=$2, updated=$3 WHERE id=$4",
-		session.CurrentPlayer, session.Status, session.Updated, session.ID)
+	_, err := db.Conn.Exec(context.Background(), "UPDATE sessions SET status=$1, updated=$2 WHERE id=$3",
+		session.Status, session.Updated, session.ID)
 	if err != nil {
 		return Session{}, err
 	}
@@ -119,8 +118,8 @@ func DeleteSession(id int32) error {
 
 func GetSessionByUserId(userId int32) (Session, error) {
 	var session Session
-	err := db.Conn.QueryRow(context.Background(), "SELECT id, current_player, status, created, updated FROM sessions WHERE user_id = $1", userId).Scan(
-		&session.ID, &session.CurrentPlayer, &session.Status, &session.Created, &session.Updated)
+	err := db.Conn.QueryRow(context.Background(), "SELECT id, status, created, updated FROM sessions WHERE user_id = $1", userId).Scan(
+		&session.ID, &session.Status, &session.Created, &session.Updated)
 	if err != nil {
 		return Session{}, err
 	}
@@ -145,8 +144,8 @@ func GetSessionByUserId(userId int32) (Session, error) {
 
 func GetSessionByIdAndUserId(sessionId int32, userId int32) (Session, error) {
 	var session Session
-	err := db.Conn.QueryRow(context.Background(), "SELECT id, current_player, status, created, updated FROM sessions WHERE id = $1 AND user_id = $2", sessionId, userId).Scan(
-		&session.ID, &session.CurrentPlayer, &session.Status, &session.Created, &session.Updated)
+	err := db.Conn.QueryRow(context.Background(), "SELECT id, status, created, updated FROM sessions WHERE id = $1 AND user_id = $2", sessionId, userId).Scan(
+		&session.ID, &session.Status, &session.Created, &session.Updated)
 	if err != nil {
 		return Session{}, err
 	}

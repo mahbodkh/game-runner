@@ -7,7 +7,6 @@ CREATE TABLE players (
     name VARCHAR(255),
     language_code VARCHAR(10),
     session_id INT,
-    mark CHAR(1),
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -32,8 +31,8 @@ type Player struct {
 
 func GetPlayerById(id int32) (Player, error) {
 	var player Player
-	err := db.Conn.QueryRow(context.Background(), "SELECT id, telegram_id, name, language_code, mark, created, updated FROM players WHERE id = $1", id).Scan(
-		&player.ID, &player.TelegramId, &player.Name, &player.LanguageCode, &player.Mark, &player.Created, &player.Updated)
+	err := db.Conn.QueryRow(context.Background(), "SELECT id, telegram_id, name, language_code, created, updated FROM players WHERE id = $1", id).Scan(
+		&player.ID, &player.TelegramId, &player.Name, &player.LanguageCode, &player.Created, &player.Updated)
 	if err != nil {
 		return Player{}, err
 	}
@@ -43,8 +42,8 @@ func GetPlayerById(id int32) (Player, error) {
 func SavePlayer(player Player) (int32, error) {
 	var id int32
 	err := db.Conn.QueryRow(context.Background(),
-		"INSERT INTO players (telegram_id, name, language_code, mark, created, updated) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-		player.TelegramId, player.Name, player.LanguageCode, player.Mark, player.Created, player.Updated).Scan(&id)
+		"INSERT INTO players (telegram_id, name, language_code, created, updated) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		player.TelegramId, player.Name, player.LanguageCode, player.Created, player.Updated).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -52,8 +51,8 @@ func SavePlayer(player Player) (int32, error) {
 }
 
 func UpdatePlayer(player Player) (Player, error) {
-	_, err := db.Conn.Exec(context.Background(), "UPDATE players SET telegram_id=$1, name=$2, language_code=$3, mark=$4, updated=$5 WHERE id=$6",
-		player.TelegramId, player.Name, player.LanguageCode, player.Mark, player.Updated, player.ID)
+	_, err := db.Conn.Exec(context.Background(), "UPDATE players SET telegram_id=$1, name=$2, language_code=$3, updated=$4 WHERE id=$5",
+		player.TelegramId, player.Name, player.LanguageCode, player.Updated, player.ID)
 	if err != nil {
 		return Player{}, err
 	}

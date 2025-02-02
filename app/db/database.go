@@ -61,14 +61,12 @@ func createTables() {
             telegram_id INT,
             name VARCHAR(255),
             language_code VARCHAR(10),
-            mark CHAR(1),
             created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         CREATE TABLE IF NOT EXISTS sessions (
             id SERIAL PRIMARY KEY,
             status session_status,
-            current_player INT,
             created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );

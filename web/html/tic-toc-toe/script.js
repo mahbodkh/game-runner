@@ -15,6 +15,12 @@ ws.onopen = () => {
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
   console.log('Received data:', data);
+
+  if (!data || !data.status) {
+    console.error('Invalid data received:', data);
+    return;
+  }
+
   switch (data.status) {
     case 'created':
       currentPlayer = data.player;
@@ -22,6 +28,10 @@ ws.onmessage = (event) => {
       updateSessionList();
       break;
     case 'started':
+      if (!data.player1 || !data.player2) {
+        console.error('Invalid player data received:', data);
+        return;
+      }
       updatePlayers(data.player1, data.player2);
       updateBoard(data.board);
       break;
